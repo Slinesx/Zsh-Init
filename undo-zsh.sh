@@ -37,6 +37,7 @@ echo " • Removing leftover Zsh files in /root"
 rm -f /root/.zshrc \
       /root/.p10k.zsh \
       /root/.zcompdump* \
+      /root/.z \
       /root/.zsh_history
 
 rm -rf /root/.config
