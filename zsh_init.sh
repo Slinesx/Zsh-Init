@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-trap 'echo "❌ Error on line $LINENO: \`$BASH_COMMAND\`" >&2' ERR
+# ─── Error handling ──────────────────────────────────────────────────────────────
+trap 'echo "❌ Error on line $LINENO: \`$BASH_COMMAND\`" >&2; exit 1' ERR
 trap 'echo "🔪 Interrupted." >&2; exit 1' INT
 
 echo "🚀 Starting Zsh + Oh-My-Zsh setup…"
@@ -9,24 +10,35 @@ echo "🚀 Starting Zsh + Oh-My-Zsh setup…"
 # 1) Check root
 (( EUID == 0 )) || { echo "❌ Please run as root." >&2; exit 1; }
 
-# 2) Detect package manager
-if   command -v apt   >/dev/null; then PM_UPDATE="apt update";    PM_INSTALL="apt install -y"; DISTRO=debian
-elif command -v yum   >/dev/null; then PM_UPDATE="yum makecache"; PM_INSTALL="yum install -y"; DISTRO=rhel
-elif command -v dnf   >/dev/null; then PM_UPDATE="dnf makecache"; PM_INSTALL="dnf install -y"; DISTRO=rhel
-else echo "❌ Unsupported distro." >&2; exit 1; fi
+# 2) Detect package manager (quiet)
+if   command -v apt-get >/dev/null; then
+  PM_UPDATE="apt-get update -qq"
+  PM_INSTALL="apt-get install -y -qq"
+  DISTRO=debian
+elif command -v yum >/dev/null; then
+  PM_UPDATE="yum makecache -q"
+  PM_INSTALL="yum install -y -q"
+  DISTRO=rhel
+elif command -v dnf >/dev/null; then
+  PM_UPDATE="dnf makecache -q"
+  PM_INSTALL="dnf install -y -q"
+  DISTRO=rhel
+else
+  echo "❌ Unsupported distro." >&2
+  exit 1
+fi
 
 echo "🔧 Installing prerequisites…"
 $PM_UPDATE
 if [ "$DISTRO" = debian ]; then
   $PM_INSTALL zsh git curl unzip xz-utils
 else
-  $PM_INSTALL zsh git util-linux-user curl unzip xz
+  $PM_INSTALL zsh git curl unzip xz
 fi
 
 echo "🛠️  Cloning Oh-My-Zsh and preparing skeleton…"
-chsh -s /bin/zsh root
-[ ! -d /etc/oh-my-zsh ] && \
-  git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /etc/oh-my-zsh
+chsh -s /bin/zsh root >/dev/null 2>&1
+[ ! -d /etc/oh-my-zsh ] && git clone --depth=1 --quiet https://github.com/ohmyzsh/ohmyzsh.git /etc/oh-my-zsh
 cp /etc/oh-my-zsh/templates/zshrc.zsh-template /etc/skel/.zshrc
 mkdir -p /etc/skel/.config
 
@@ -49,14 +61,12 @@ echo 'alias ll="ls -lahF --color --time-style=long-iso"' >> /etc/skel/.zshrc
 echo "🔌 Installing plugins…"
 PLUGINS=/etc/oh-my-zsh/custom/plugins
 mkdir -p $PLUGINS
-[ ! -d $PLUGINS/zsh-syntax-highlighting ]   && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git $PLUGINS/zsh-syntax-highlighting
-[ ! -d $PLUGINS/zsh-autosuggestions ]      && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git  $PLUGINS/zsh-autosuggestions
-[ ! -d $PLUGINS/zsh-completions ]          && git clone --depth=1 https://github.com/zsh-users/zsh-completions.git    $PLUGINS/zsh-completions
-if [ ! -d $PLUGINS/shellfirm ]; then
-  mkdir -p $PLUGINS/shellfirm
-  curl -fsSL https://raw.githubusercontent.com/kaplanelad/shellfirm/main/shell-plugins/shellfirm.plugin.oh-my-zsh.zsh \
-    -o $PLUGINS/shellfirm/shellfirm.plugin.zsh
-fi
+git clone --depth=1 --quiet https://github.com/zsh-users/zsh-syntax-highlighting.git $PLUGINS/zsh-syntax-highlighting 2>/dev/null || true
+git clone --depth=1 --quiet https://github.com/zsh-users/zsh-autosuggestions.git  $PLUGINS/zsh-autosuggestions  2>/dev/null || true
+git clone --depth=1 --quiet https://github.com/zsh-users/zsh-completions.git     $PLUGINS/zsh-completions     2>/dev/null || true
+mkdir -p $PLUGINS/shellfirm
+curl -fsSL https://raw.githubusercontent.com/kaplanelad/shellfirm/main/shell-plugins/shellfirm.plugin.oh-my-zsh.zsh \
+  -o $PLUGINS/shellfirm/shellfirm.plugin.zsh
 
 # FPATH for completions
 sed -i '/^source \$ZSH\/oh-my-zsh.sh/i fpath+=${ZSH_CUSTOM:-${ZSH:-~\/.oh-my-zsh}\/custom}\/plugins\/zsh-completions\/src' \
@@ -69,8 +79,7 @@ sed -i '/^plugins=/c plugins=(shellfirm copypath git zsh-autosuggestions extract
 echo "🎨 Installing Powerlevel10k…"
 TH=/etc/oh-my-zsh/custom/themes
 mkdir -p $TH
-[ ! -d $TH/powerlevel10k ] && \
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $TH/powerlevel10k
+git clone --depth=1 --quiet https://github.com/romkatv/powerlevel10k.git $TH/powerlevel10k 2>/dev/null || true
 curl -fsSL https://raw.githubusercontent.com/Slinesx/Zsh-Init/main/p10k.zsh \
   -o /etc/oh-my-zsh/custom/p10k.zsh
 
