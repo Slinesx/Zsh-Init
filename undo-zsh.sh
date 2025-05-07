@@ -32,18 +32,17 @@ rm -rf /etc/skel/.config
 echo " • Removing /usr/local/bin/shellfirm"
 rm -f /usr/local/bin/shellfirm
 
-# 6) Clean up root’s Zsh‐related files
+# 6) Clean up root’s Zsh-related files
 echo " • Removing leftover Zsh files in /root"
 rm -f /root/.zshrc \
       /root/.p10k.zsh \
-      /root/.z \
       /root/.zcompdump* \
       /root/.zsh_history
 
 rm -rf /root/.config
 
-# 7) Clear any stray fpath cache (optional)
-/usr/bin/whence -f zsh &>/dev/null && zsh -c 'rm -f $HOME/.zcompdump*' || true
+# 7) Clear any stray zcompdump cache (if zsh is available)
+command -v zsh &>/dev/null && zsh -c 'rm -f $HOME/.zcompdump*' || true
 
 echo "✅ Rollback complete."
 
