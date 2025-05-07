@@ -2,6 +2,24 @@
 
 A single-command installer and rollback for a global Zsh + Oh-My-Zsh setup with Powerlevel10k, Shellfirm, and a curated set of plugins.
 
+## Quickstart
+
+### Install / Configure
+
+Run as root to install and configure:
+
+```bash
+bash -c "$(curl -H 'Cache-Control: no-cache, no-store' -fsSL https://raw.githubusercontent.com/Slinesx/Zsh-Init/main/zsh_init.sh)"
+```
+
+### Rollback / Uninstall
+
+To undo all changes and return to Bash:
+
+```bash
+bash -c "$(curl -H 'Cache-Control: no-cache, no-store' -fsSL https://raw.githubusercontent.com/Slinesx/Zsh-Init/main/undo-zsh.sh)"
+```
+
 ## Repository Contents
 
 - **zsh_init.sh**  
@@ -21,23 +39,3 @@ A single-command installer and rollback for a global Zsh + Oh-My-Zsh setup with 
 
 - **p10k.zsh**  
   Centralized Powerlevel10k theme configuration. Symlinked into each user’s home as `~/.p10k.zsh`.
-
-## Quickstart
-
-### Install / Configure
-
-Run as root to install and configure:
-
-\`\`\`bash
-bash -c "$(curl -H 'Cache-Control: no-cache, no-store' -fsSL https://raw.githubusercontent.com/Slinesx/Zsh-Init/main/zsh_init.sh)"
-\`\`\`
-
-### Rollback / Uninstall
-
-To undo all changes and return to Bash:
-
-\`\`\`bash
-bash -c "$(curl -H 'Cache-Control: no-cache, no-store' -fsSL https://raw.githubusercontent.com/Slinesx/Zsh-Init/main/undo-zsh.sh)"
-\`\`\`
-
-Feel free to inspect and customize any script to suit your environment!
