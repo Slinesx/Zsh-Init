@@ -26,7 +26,7 @@ rm -f /root/.zshrc \
       /root/.z \
       /root/.zcompdump* \
       /root/.zsh_history
-rm -rf /root/.config
+rm -rf /root/.config /root/.cache
 
 echo "📦 Uninstalling packages…"
 apt-get update -qq
