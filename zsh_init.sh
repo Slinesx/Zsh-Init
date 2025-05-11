@@ -83,16 +83,17 @@ curl -fsSL "$URL" \
   | tar -xJf - --wildcards --strip-components=1 -C /usr/local/bin '*shellfirm*/shellfirm' > /dev/null
 chmod +x /usr/local/bin/shellfirm
 
-# ─── 7) Create new user with sudo privileges ─────────────────────────────────────
+# ─── 7) Finalize & prepare shell ──────────────────────────────────────────────────
+echo "🔧 Configuring Zsh as default shell…"
+sed -i '/^SHELL=/c SHELL=/bin/zsh' /etc/default/useradd > /dev/null || true
+install -m644 /etc/skel/.zshrc /root/.zshrc
+mkdir -p /root/.config
+
+# ─── 8) Create new user with sudo privileges ─────────────────────────────────────
 echo "👤 Creating a new sudo user…"
 read -p "Enter username: " username
 useradd -m -G sudo "$username"
 passwd "$username"
 
-# ─── 8) Finalize & switch ──────────────────────────────────────────────────────────
-echo "✅ Setup complete! Switching to Zsh…"
-sed -i '/^SHELL=/c SHELL=/bin/zsh' /etc/default/useradd > /dev/null || true
-install -m644 /etc/skel/.zshrc /root/.zshrc
-mkdir -p /root/.config
-
+echo "✅ Setup complete! Switching root shell to Zsh…"
 exec /bin/zsh -l
