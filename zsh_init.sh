@@ -13,11 +13,11 @@ echo "🚀 Starting Zsh + Oh-My-Zsh setup (Debian/Ubuntu)…"
 # ─── 2) Install prerequisites ──────────────────────────────────────────────────────
 echo "🔧 Installing prerequisites…"
 apt-get update -qq
-apt-get install -y -qq zsh git xz-utils
+apt-get install -y -qq zsh git xz-utils > /dev/null
 
 # ─── 3) Clone Oh-My-Zsh & prepare skeleton ────────────────────────────────────────
 echo "🛠️  Cloning Oh-My-Zsh & preparing skeleton…"
-chsh -s /bin/zsh root >/dev/null 2>&1
+chsh -s /bin/zsh root > /dev/null
 [ ! -d /etc/oh-my-zsh ] && git clone --depth=1 --quiet https://github.com/ohmyzsh/ohmyzsh.git /etc/oh-my-zsh
 cp /etc/oh-my-zsh/templates/zshrc.zsh-template /etc/skel/.zshrc
 mkdir -p /etc/skel/.config
@@ -40,9 +40,9 @@ echo "🔌 Installing plugins…"
 PLUGINS=/etc/oh-my-zsh/custom/plugins
 mkdir -p "$PLUGINS"
 
-git clone --depth=1 --quiet https://github.com/zsh-users/zsh-syntax-highlighting.git "$PLUGINS/zsh-syntax-highlighting" 2>/dev/null || true
-git clone --depth=1 --quiet https://github.com/zsh-users/zsh-autosuggestions.git  "$PLUGINS/zsh-autosuggestions"   2>/dev/null || true
-git clone --depth=1 --quiet https://github.com/zsh-users/zsh-completions.git     "$PLUGINS/zsh-completions"      2>/dev/null || true
+git clone --depth=1 --quiet https://github.com/zsh-users/zsh-syntax-highlighting.git "$PLUGINS/zsh-syntax-highlighting" > /dev/null || true
+git clone --depth=1 --quiet https://github.com/zsh-users/zsh-autosuggestions.git  "$PLUGINS/zsh-autosuggestions" > /dev/null || true
+git clone --depth=1 --quiet https://github.com/zsh-users/zsh-completions.git     "$PLUGINS/zsh-completions" > /dev/null || true
 
 mkdir -p "$PLUGINS/shellfirm"
 curl -fsSL https://raw.githubusercontent.com/kaplanelad/shellfirm/main/shell-plugins/shellfirm.plugin.oh-my-zsh.zsh \
@@ -58,7 +58,7 @@ sed -i '/^plugins=/c plugins=(shellfirm copypath git zsh-autosuggestions extract
 echo "🎨 Installing Powerlevel10k…"
 THEMES=/etc/oh-my-zsh/custom/themes
 mkdir -p "$THEMES"
-git clone --depth=1 --quiet https://github.com/romkatv/powerlevel10k.git "$THEMES/powerlevel10k" 2>/dev/null || true
+git clone --depth=1 --quiet https://github.com/romkatv/powerlevel10k.git "$THEMES/powerlevel10k" > /dev/null || true
 curl -fsSL https://raw.githubusercontent.com/Slinesx/Zsh-Init/main/p10k.zsh \
   -o /etc/oh-my-zsh/custom/p10k.zsh
 
@@ -80,12 +80,12 @@ URL=$(curl -s https://api.github.com/repos/kaplanelad/shellfirm/releases/latest 
      | cut -d '"' -f4 \
      | head -n1)
 curl -fsSL "$URL" \
-  | tar -xJf - --wildcards --strip-components=1 -C /usr/local/bin '*shellfirm*/shellfirm' 2>/dev/null
+  | tar -xJf - --wildcards --strip-components=1 -C /usr/local/bin '*shellfirm*/shellfirm' > /dev/null
 chmod +x /usr/local/bin/shellfirm
 
 # ─── 7) Finalize & switch ──────────────────────────────────────────────────────────
 echo "✅ Setup complete! Switching to Zsh…"
-sed -i '/^SHELL=/c SHELL=/bin/zsh' /etc/default/useradd 2>/dev/null || true
+sed -i '/^SHELL=/c SHELL=/bin/zsh' /etc/default/useradd > /dev/null || true
 install -m644 /etc/skel/.zshrc /root/.zshrc
 mkdir -p /root/.config
 exec /bin/zsh -l
