@@ -36,7 +36,7 @@ for dir in /home/*; do
   [ -d "$dir" ] || continue
   user=$(basename "$dir")
   echo " • Deleting user '$user'"
-  userdel -r "$user" >/dev/null || echo "⚠️ Could not remove '$user'" >&2
+  userdel -r "$user" >/dev/null
 done
 
 # 6) Switch back to Bash
