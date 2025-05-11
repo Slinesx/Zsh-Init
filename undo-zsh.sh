@@ -1,51 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Must run as root
-if (( EUID != 0 )); then
-  echo "❌ Please run as root." >&2
-  exit 1
-fi
+# ─── Error handling ────────────────────────────────────────────────────
+trap 'echo "❌ Error on line $LINENO: \`$BASH_COMMAND\`" >&2; exit 1' ERR
+trap 'echo "🔪 Interrupted." >&2; exit 1' INT
 
-echo "🔄 Rolling back Zsh/Oh-My-Zsh configuration…"
+echo "🛑 Rolling back Zsh + Oh-My-Zsh…"
 
-# 1) Reset root’s shell to bash
-echo " • Resetting root shell → /bin/bash"
-chsh -s /bin/bash root
+# must be root
+(( EUID == 0 )) || { echo "❌ Run as root!" >&2; exit 1; }
 
-# 2) Restore default for new users
-if [ -f /etc/default/useradd ]; then
-  echo " • Restoring /etc/default/useradd SHELL to /bin/bash"
-  sed -i 's|^SHELL=.*|SHELL=/bin/bash|' /etc/default/useradd
-fi
+echo "🔄 Resetting shells to bash…"
+chsh -s /bin/bash root >/dev/null 2>&1
+[ -f /etc/default/useradd ] && sed -i 's|^SHELL=.*|SHELL=/bin/bash|' /etc/default/useradd
 
-# 3) Remove global Oh-My-Zsh tree
-echo " • Removing /etc/oh-my-zsh"
+echo "🗑️  Removing system-wide Zsh configs & binaries…"
 rm -rf /etc/oh-my-zsh
-
-# 4) Remove system-wide skeleton config
-echo " • Cleaning /etc/skel/.zshrc and /etc/skel/.config"
 rm -f /etc/skel/.zshrc
 rm -rf /etc/skel/.config
-
-# 5) Remove Shellfirm binary
-echo " • Removing /usr/local/bin/shellfirm"
 rm -f /usr/local/bin/shellfirm
 
-# 6) Clean up root’s Zsh-related files
-echo " • Removing leftover Zsh files in /root"
+echo "🗑️  Removing root user Zsh configs…"
 rm -f /root/.zshrc \
       /root/.p10k.zsh \
-      /root/.zcompdump* \
       /root/.z \
+      /root/.zcompdump* \
       /root/.zsh_history
-
 rm -rf /root/.config
 
-# 7) Clear any stray zcompdump cache (if zsh is available)
-command -v zsh &>/dev/null && zsh -c 'rm -f $HOME/.zcompdump*' || true
+echo "📦 Uninstalling packages…"
+apt-get update -qq
+apt-get purge -y -qq zsh git curl unzip xz-utils
+apt-get autoremove -y -qq
+apt-get clean -qq
 
-echo "✅ Rollback complete."
+echo "🧑‍💻 Removing all users with homes in /home…"
+for dir in /home/*; do
+  [ -d "$dir" ] || continue
+  user=$(basename "$dir")
+  echo " • Deleting user '$user'"
+  userdel -r "$user" >/dev/null 2>&1 || echo "⚠️ Could not remove '$user'" >&2
+done
 
-# 8) Immediately switch this session back to Bash
-exec /bin/bash -l
+echo "✅ Rollback complete!"
