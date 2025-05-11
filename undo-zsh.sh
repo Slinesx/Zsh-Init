@@ -31,14 +31,6 @@ apt-get purge -y -qq zsh git xz-utils > /dev/null
 apt-get autoremove -y -qq > /dev/null
 apt-get clean -qq > /dev/null
 
-echo "🧑‍💻 Removing all users with homes in /home…"
-for dir in /home/*; do
-  [ -d "$dir" ] || continue
-  user=$(basename "$dir")
-  echo " • Deleting user '$user'"
-  userdel -r "$user" >/dev/null
-done
-
 # 6) Switch back to Bash
 echo "✅ Rollback complete! Switching to Bash…"
 exec /bin/bash -l
