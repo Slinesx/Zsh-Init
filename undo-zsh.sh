@@ -7,39 +7,30 @@ trap 'echo "🔪 Interrupted." >&2; exit 1' INT
 
 echo "🛑 Rolling back Zsh + Oh-My-Zsh…"
 
-# must be root
+# 1) Must run as root
 (( EUID == 0 )) || { echo "❌ Run as root!" >&2; exit 1; }
 
-echo "🔄 Resetting shells to bash…"
+# 2) Reset root’s shell to Bash
+echo "🔄 Resetting root shell to Bash…"
 chsh -s /bin/bash root >/dev/null 2>&1
 [ -f /etc/default/useradd ] && sed -i 's|^SHELL=.*|SHELL=/bin/bash|' /etc/default/useradd
 
-echo "🗑️  Removing system-wide Zsh configs & binaries…"
-rm -rf /etc/oh-my-zsh
-rm -f /etc/skel/.zshrc
-rm -rf /etc/skel/.config
-rm -f /usr/local/bin/shellfirm
+# 3) Remove global Zsh configs & Shellfirm
+echo "🗑️  Removing global Zsh configs and Shellfirm…"
+rm -rf /etc/oh-my-zsh /etc/skel/.zshrc /etc/skel/.config /usr/local/bin/shellfirm
 
-echo "🗑️  Removing root user Zsh configs…"
-rm -f /root/.zshrc \
-      /root/.p10k.zsh \
-      /root/.z \
-      /root/.zcompdump* \
-      /root/.zsh_history
+# 4) Clean up /root’s Zsh files
+echo "🗑️  Cleaning up /root Zsh files…"
+rm -f /root/.zshrc /root/.p10k.zsh /root/.z /root/.zcompdump* /root/.zsh_history
 rm -rf /root/.config /root/.cache
 
-echo "📦 Uninstalling packages…"
-apt-get update -qq
-apt-get purge -y -qq zsh git xz-utils
-apt-get autoremove -y -qq
-apt-get clean -qq
+# 5) Uninstall packages quietly
+echo "📦 Uninstalling Zsh, Git, XZ-utils…"
+apt-get update -qq > /dev/null 2>&1
+apt-get purge -y -qq zsh git xz-utils > /dev/null 2>&1
+apt-get autoremove -y -qq > /dev/null 2>&1
+apt-get clean -qq > /dev/null 2>&1
 
-echo "🧑‍💻 Removing all users with homes in /home…"
-for dir in /home/*; do
-  [ -d "$dir" ] || continue
-  user=$(basename "$dir")
-  echo " • Deleting user '$user'"
-  userdel -r "$user" >/dev/null 2>&1 || echo "⚠️ Could not remove '$user'" >&2
-done
-
-echo "✅ Rollback complete!"
+# 6) Switch back to Bash
+echo "✅ Rollback complete! Switching to Bash…"
+exec /bin/bash -l
