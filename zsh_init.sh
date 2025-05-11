@@ -24,7 +24,7 @@ mkdir -p /etc/skel/.config
 
 # instant prompt for Powerlevel10k
 sed -i '1i\
-# ⏱︎ Instant prompt for Powerlevel10k\n\
+# Instant prompt for Powerlevel10k\n\
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then\n\
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"\n\
 fi\n' /etc/skel/.zshrc
@@ -65,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/Slinesx/Zsh-Init/main/p10k.zsh \
 # symlink central p10k.zsh for new users
 cat >> /etc/skel/.zshrc << 'EOF'
 
-# 🌟 Load central p10k configuration
+# Load central p10k configuration
 if [ ! -L "$HOME/.p10k.zsh" ]; then
   ln -s /etc/oh-my-zsh/custom/p10k.zsh "$HOME/.p10k.zsh"
 fi
