@@ -30,7 +30,7 @@ rm -rf /root/.config
 
 echo "📦 Uninstalling packages…"
 apt-get update -qq
-apt-get purge -y -qq zsh git curl unzip xz-utils
+apt-get purge -y -qq zsh git xz-utils
 apt-get autoremove -y -qq
 apt-get clean -qq
 

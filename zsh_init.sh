@@ -13,7 +13,7 @@ echo "🚀 Starting Zsh + Oh-My-Zsh setup (Debian/Ubuntu)…"
 # ─── 2) Install prerequisites ──────────────────────────────────────────────────────
 echo "🔧 Installing prerequisites…"
 apt-get update -qq
-apt-get install -y -qq zsh git curl unzip xz-utils
+apt-get install -y -qq zsh git xz-utils
 
 # ─── 3) Clone Oh-My-Zsh & prepare skeleton ────────────────────────────────────────
 echo "🛠️  Cloning Oh-My-Zsh & preparing skeleton…"
