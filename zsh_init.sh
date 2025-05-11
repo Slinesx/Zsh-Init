@@ -89,11 +89,5 @@ sed -i '/^SHELL=/c SHELL=/bin/zsh' /etc/default/useradd > /dev/null || true
 install -m644 /etc/skel/.zshrc /root/.zshrc
 mkdir -p /root/.config
 
-# ─── 8) Create new user with sudo privileges ─────────────────────────────────────
-echo "👤 Creating a new sudo user…"
-read -p "Enter username: " username
-useradd -m -G sudo "$username"
-passwd "$username"
-
 echo "✅ Setup complete! Switching root shell to Zsh…"
 exec /bin/zsh -l
